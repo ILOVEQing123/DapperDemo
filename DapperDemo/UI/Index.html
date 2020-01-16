@@ -1,0 +1,166 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Dapper试用版</title>
+
+
+    <script src="VUE.js"></script>
+    <script src="JavaScript.js"></script>
+    <link href="bootstrap-3.3.7-dist/css/bootstrap.css" rel="stylesheet" />
+
+</head>
+<body>
+    <div id="wapper">
+        <div id="top">
+            <font>用户ID:</font><input type="text" id="user_id" contextmenu="请输入用户ID" />&nbsp;
+            <font>用户密码:</font><input type="text" id="u_password" contextmenu="请输入用户密码" />&nbsp;
+            <font>用户性别:</font><input type="text" id="gender" contextmenu="请输入用户性别" />&nbsp;
+            <font>用户名:</font><input type="text" id="user_name" contextmenu="请输入用户名" />&nbsp;
+
+            <font>用户状态:</font><input id="status" type="checkbox" contextmenu="" />y/n
+            <input type="button" id="add" value="提交" v-on:click="Insert()" />
+            <br />
+            <font>用户ID:</font><input id="ID" type="text" contextmenu="" />
+            <input type="button" id="add" value="查询" v-on:click="selectByID()" />
+            <input type="button" id="add" value="修改" v-on:click="UpdateUser()" />
+            <input type="button" id="add" value="删除" v-on:click="DelectUser()" />
+        </div>
+        <hr />
+
+        <div id="moddle">
+            <table class="table ">
+
+                <!-- On cells (`td` or `th`) -->
+                <tr>
+                    <td class="active">user_id</td>
+                    <td class="success">u_id</td>
+                    <td class="warning">u_password</td>
+                    <td class="danger">gender</td>
+                    <td class="info">user_name</td>
+
+                    <td class="success">creation_time</td>
+                    <td class="warning">status</td>
+                </tr>
+
+                <tr v-for="user in  sites">
+                    <td class="active">{{ user.user_id }}</td>
+                    <td class="success">{{user.u_id}}</td>
+                    <td class="warning">{{user.u_password}}</td>
+                    <td class="danger">{{user.gender}}</td>
+                    <td class="info">{{user.user_name}}</td>
+                    <td class="success">{{user.creation_time}}</td>
+                    <td class="warning">{{user.status}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>
+<script>
+
+
+    new Vue({
+        el: '#wapper',
+        data: {
+            sites: []
+        },
+        mounted: function () {
+            this.select();
+        },
+        methods: {
+            select: function () {
+                $.ajax({
+                    url: "../api/Default/select",
+                   
+
+                    success:(msg) =>{
+                        this.sites = msg;
+                    }
+                      
+                })
+            },
+            selectByID: function () {
+                var date = { "user_id": $("#ID").val() };
+                $.ajax({
+                 
+                    url: "../api/Default/SelectByID",
+                    type: "post",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(date),
+                    success: (msg) => {
+                        if (msg == "") {
+                            alert("数据不存在");
+                        }
+                        else {
+                            this.sites = msg;   
+                        }
+                        
+                        console.info(msg);
+                    }
+                })
+            },
+            DelectUser: function () {
+                var date = { "user_id": $("#ID").val() };
+                $.ajax({
+                    url: "../api/Default/DelectUser",
+                    type: "post",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(date),
+                    success: (msg) => {
+                        if (msg == "") {
+                            alert("数据不存在");
+                        }
+                        else {
+                            this.select();
+                        }
+
+                        console.info(msg);
+                    }
+                })
+            },
+            UpdateUser: function () {
+                var date = { "user_id": $("#ID").val() ,u_id: $("#user_id").val(), u_password: $("#u_password").val(), gender: $("#gender").val(), user_name: $("#user_name").val(), status: "g"};
+                $.ajax({
+
+                    url: "../api/Default/UpdateUser",
+                    type: "post",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(date),
+                    success: (msg) => {
+                        if (msg == "") {
+                            alert("数据不存在");
+                        }
+                        else {
+                            this.select();
+                        }
+
+                        console.info(msg);
+                    }
+                })
+            },
+            Insert: function () {
+                var add_data = { u_id: $("#user_id").val(), u_password: $("#u_password").val(), gender: $("#gender").val(), user_name: $("#user_name").val(), status: "g" };
+                $.ajax({
+                    url: "../api/Default/Insert",
+                    type: "post",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(add_data),
+                    success:  (msg)=> {
+                       this.select();
+                    },
+                    error(msg) {
+                        alert("提示：" + msg);
+                    }
+                })
+            }
+        }
+
+    })
+</script>
+
